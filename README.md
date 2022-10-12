@@ -36,6 +36,9 @@ yarn start:dev
 http://localhost:3000/graphql
 ```
 
+9. Ejecutar la mutation __executeSeed__ para purgar la base de datos y llenarla con datos de prueba
+
+
 # Recomendaciones
 - Descargar Docker Desktop para levantar la base de datos
 
