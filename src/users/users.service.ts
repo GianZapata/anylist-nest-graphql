@@ -42,6 +42,17 @@ export class UsersService {
       .getMany();
   }
 
+  async findOneByEmailWithPassword(email: string): Promise<User> {
+    try {
+      return await this.userRepository.findOneOrFail({
+        where: { email },
+        select: ['id', 'email', 'password', 'roles', 'isActive'],
+      });
+    } catch (error) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+  }
+
   async findOneByEmail(email: string): Promise<User> {
     try {
       return await this.userRepository.findOneOrFail({ where: { email } });
@@ -49,6 +60,7 @@ export class UsersService {
       throw new NotFoundException(`User with email ${email} not found`);
     }
   }
+
   async findOneById(id: string): Promise<User> {
     try {
       return await this.userRepository.findOneOrFail({ where: { id } });

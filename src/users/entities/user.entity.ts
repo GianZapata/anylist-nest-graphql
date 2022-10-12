@@ -5,9 +5,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { hashSync } from 'bcrypt';
+import { Item } from '../../items/entities/item.entity';
 
 @Entity({ name: 'users' })
 @ObjectType()
@@ -26,7 +28,7 @@ export class User {
   @Field(() => String)
   email: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @Column({
@@ -65,6 +67,11 @@ export class User {
   @JoinColumn({ name: 'lastUpdateBy' })
   @Field(() => User, { nullable: true })
   lastUpdateBy?: User;
+
+  // Un usuario puede tener muchos items
+  @OneToMany(() => Item, (item) => item.user, { lazy: true })
+  @Field(() => [Item])
+  items: Item[];
 
   @BeforeInsert()
   beforeInsertActions() {

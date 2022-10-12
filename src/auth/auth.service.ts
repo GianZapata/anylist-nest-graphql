@@ -22,7 +22,7 @@ export class AuthService {
   }
 
   async login({ email, password }: LoginInput): Promise<AuthResponse> {
-    const user = await this.usersService.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmailWithPassword(email);
 
     if (!compareSync(password, user.password))
       throw new BadRequestException('Invalid credentials');
