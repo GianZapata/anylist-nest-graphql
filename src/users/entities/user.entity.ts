@@ -1,5 +1,12 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { hashSync } from 'bcrypt';
 
 @Entity({ name: 'users' })
@@ -36,6 +43,28 @@ export class User {
   })
   @Field(() => [String])
   roles: string[];
+
+  // Timestamps
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.lastUpdateBy, {
+    nullable: true,
+    lazy: true,
+  })
+  @JoinColumn({ name: 'lastUpdateBy' })
+  @Field(() => User, { nullable: true })
+  lastUpdateBy?: User;
 
   @BeforeInsert()
   beforeInsertActions() {
