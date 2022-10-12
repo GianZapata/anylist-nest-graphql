@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { ConfigModule } from '@nestjs/config';
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -10,6 +10,7 @@ import { JoiValidationSchema } from './config/joi.validation';
 import { EnvConfiguration } from './config/env.config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -17,11 +18,28 @@ import { AuthModule } from './auth/auth.module';
       load: [EnvConfiguration],
       validationSchema: JoiValidationSchema,
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    // TODO: Configuración Básica
+    // GraphQLModule.forRoot<ApolloDriverConfig>({
+    //   driver: ApolloDriver,
+    //   playground: false,
+    //   plugins: [ApolloServerPluginLandingPageLocalDefault],
+    //   autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    // }),
+    GraphQLModule.forRootAsync({
       driver: ApolloDriver,
-      playground: false,
-      plugins: [ApolloServerPluginLandingPageLocalDefault],
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      imports: [AuthModule],
+      inject: [JwtService],
+      useFactory: async (jwtService: JwtService) => ({
+        playground: false,
+        autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+        plugins: [ApolloServerPluginLandingPageLocalDefault],
+        context({ req }) {
+          const token = req.headers.authorization?.replace('Bearer ', ''); // With ? we check if the property exists and if it does, we replace the Bearer string with an empty string
+          if (!token) throw new Error('No token provided');
+          const payload = jwtService.decode(token);
+          if (!payload) throw new Error('Invalid token');
+        },
+      }),
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',

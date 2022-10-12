@@ -13,6 +13,8 @@ async function bootstrap() {
     }),
   );
 
+  app.setGlobalPrefix('api');
+
   const PORT = process.env.PORT || 3000;
   await app.listen(PORT);
   logger.log(`Application listening on port ${PORT}`);

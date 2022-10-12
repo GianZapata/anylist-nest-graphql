@@ -46,6 +46,7 @@ export class AuthService {
 
   revalidateToken(user: User): AuthResponse {
     const token = this.getJWTToken(user.id);
+    delete user.password;
     return {
       token,
       user,
