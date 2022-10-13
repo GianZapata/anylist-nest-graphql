@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, ID } from '@nestjs/graphql';
 import {
   Column,
   CreateDateColumn,
@@ -9,9 +9,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-@Entity({ name: 'items' })
+
 @ObjectType()
-export class Item {
+@Entity('lists')
+export class List {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => ID)
   id: string;
@@ -20,17 +21,9 @@ export class Item {
   @Field(() => String)
   name: string;
 
-  // @Column()
-  // @Field(() => Float)
-  // quantity: number;
-
-  @Column({ nullable: true })
-  @Field(() => String, { nullable: true })
-  quantityUnits: string;
-
-  // Muchos items pueden pertenecer a un solo usuario
-  @ManyToOne(() => User, (user) => user.items, { nullable: false, lazy: true })
-  @Index('userId-index')
+  // Muchas listas pueden pertenecer a un solo usuario
+  @ManyToOne(() => User, (user) => user.lists, { nullable: false, lazy: true })
+  @Index('list-userId-index')
   @Field(() => User)
   user: User;
 

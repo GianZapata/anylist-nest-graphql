@@ -9,16 +9,17 @@ import {
   Int,
   Parent,
 } from '@nestjs/graphql';
+import { User } from './entities/user.entity';
+import { List } from '../lists/entities/list.entity';
+import { Item } from '../items/entities/item.entity';
 import { UsersService } from './users.service';
 import { ItemsService } from '../items/items.service';
+import { ListsService } from '../lists/lists.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { ValidRoles } from '../auth/enums/valid-roles.enum';
-import { User } from './entities/user.entity';
+import { PaginationArgs, SearchArgs } from '../common/dto/args';
 import { ValidRolesArgs, UpdateUserInput } from './dto';
-import { Item } from '../items/entities/item.entity';
-import { PaginationArgs } from '../common/dto/args/pagination.args';
-import { SearchArgs } from '../common/dto/args/search.args';
 
 @Resolver(() => User)
 @UseGuards(JwtAuthGuard)
@@ -26,6 +27,7 @@ export class UsersResolver {
   constructor(
     private readonly usersService: UsersService,
     private readonly itemsService: ItemsService,
+    private readonly listsService: ListsService,
   ) {}
 
   @Query(() => [User], { name: 'users' })
@@ -76,5 +78,23 @@ export class UsersResolver {
     @Args() searchArgs: SearchArgs,
   ): Promise<Item[]> {
     return this.itemsService.findAll(user, paginationArgs, searchArgs);
+  }
+
+  @ResolveField(() => [List], { name: 'lists', description: 'Lists by user' })
+  async getListsByUser(
+    @CurrentUser([ValidRoles.admin]) adminUser: User,
+    @Parent() user: User,
+    @Args() paginationArgs: PaginationArgs,
+    @Args() searchArgs: SearchArgs,
+  ): Promise<List[]> {
+    return this.listsService.findAll(user, paginationArgs, searchArgs);
+  }
+
+  @ResolveField(() => Int, { name: 'listCount' })
+  async listCount(
+    @CurrentUser([ValidRoles.admin]) adminUser: User,
+    @Parent() user: User,
+  ): Promise<number> {
+    return this.listsService.listCountByUser(user);
   }
 }
