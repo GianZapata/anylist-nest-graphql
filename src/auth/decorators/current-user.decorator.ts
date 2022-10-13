@@ -21,7 +21,6 @@ export const CurrentUser = createParamDecorator(
     if (roles.length === 0) return user;
 
     for (const role of user.roles) {
-      // TODO: Delete ValidRoles[role] after testing
       if (roles.includes(role as ValidRoles)) return user;
     }
 

@@ -5,10 +5,12 @@ import {
   Entity,
   Index,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { ListItem } from '../../list-item/entities/list-item.entity';
 @Entity({ name: 'items' })
 @ObjectType()
 export class Item {
@@ -41,4 +43,8 @@ export class Item {
   @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', precision: 3 })
   @Field(() => Date)
   updatedAt: Date;
+
+  @OneToMany(() => ListItem, (listItem) => listItem.item, { lazy: true })
+  @Field(() => [ListItem])
+  listItem: ListItem[];
 }

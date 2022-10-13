@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Item } from './entities/item.entity';
 import { User } from '../users/entities/user.entity';
 import { CreateItemInput, UpdateItemInput } from './dto';
@@ -71,7 +71,6 @@ export class ItemsService {
   }
 
   async remove(id: string, user: User): Promise<Item> {
-    // TODO: soft delete, no borrar de la base de datos
     const itemToRemove = await this.findOne(id, user);
     await this.itemsRepository.remove(itemToRemove);
     return { ...itemToRemove, id };
