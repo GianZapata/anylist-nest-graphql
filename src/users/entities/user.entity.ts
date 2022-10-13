@@ -70,7 +70,7 @@ export class User {
 
   // Un usuario puede tener muchos items
   @OneToMany(() => Item, (item) => item.user, { lazy: true })
-  @Field(() => [Item])
+  // @Field(() => [Item])
   items: Item[];
 
   @BeforeInsert()
